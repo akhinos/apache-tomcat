@@ -111,8 +111,13 @@ printf "Tomcat Access Logging enabled\n"
 export JAVA_OPTS="${JAVA_OPTS} -Daccess.logging.enabled=true"
 `))
 		libDir := filepath.Join(layer.Path, "lib")
-		Expect(layer.Profile["add-classpath-entries.sh"]).To(Equal(fmt.Sprintf(`#!/bin/sh
+		Expect(layer.Profile["add-classpath-entries.sh"]).To(Equal(fmt.Sprintf(`#!/bin/bash
 set -e
+if [[ "$CLASSPATH" == *"*"* ]]; then
+    printf "Err: classpath with wildcard not supported: '%%s'\n" "$path"
+    exit 1
+fi
+
 mkdir -p "%[1]s"
 (
     IFS=:
